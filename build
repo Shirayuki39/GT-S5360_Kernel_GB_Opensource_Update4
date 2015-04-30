@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Colorize and add text parameters
+export red=$(tput setaf 1) # red
+export grn=$(tput setaf 2) # green
+export blu=$(tput setaf 4) # blue
+export cya=$(tput setaf 6) # cyan
+export txtbld=$(tput bold) # Bold
+export bldred=${txtbld}$(tput setaf 1) # Bold red
+export bldgrn=${txtbld}$(tput setaf 2) # Bold green
+export bldblu=${txtbld}$(tput setaf 4) # Bold blue
+export bldcya=${txtbld}$(tput setaf 6) # Bold cyan
+export txtrst=$(tput sgr0) # Reset
+
 # Time of build startup
   res1=$(date +%s.%N)
 
@@ -8,14 +20,20 @@
   export PARENT_DIR=`readlink -f ${KERNELDIR}/..`;
 
 # link modules to parent directory
+if [ -e $PARENT_DIR/modules ]; then
+  rm $PARENT_DIR/modules
+fi;
   ln -s $KERNELDIR/modules $PARENT_DIR/modules
 
 # name
   export KBUILD_BUILD_USER=mohammad.afaneh
   export KBUILD_BUILD_HOST=ubuntu
 
+# compiler
   export ARCH=arm
-  export CROSS_COMPILE=~/kernel/arm-eabi-4.4.3/bin/arm-eabi-
+  export CROSS_COMPILE=$PARENT_DIR/arm-eabi-4.4.3/bin/arm-eabi-
+
+# defconfig
   make bcm21553_totoro_05_defconfig
 
 # remove previous zImage files
@@ -34,13 +52,14 @@ export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`;
   echo "${bldcya}***** Compiling kernel *****${txtrst}"
 
 if [ $USER != "root" ]; then
-  make -j$NUMBEROFCPUS zImage
+  make -j$NUMBEROFCPUS
 else
-  nice -n -15 make -j$NUMBEROFCPUS zImage
+  nice -n -15 make -j$NUMBEROFCPUS
 fi;
 
 if [ -e $KERNELDIR/arch/arm/boot/zImage ]; then
   cp $KERNELDIR/arch/arm/boot/zImage $KERNELDIR/zImage;
+
   echo "${bldcya}***** Ready to Roar *****${txtrst}";
   res2=$(date +%s.%N)
   echo "${bldgrn}Total time elapsed: ${txtrst}${grn}$(echo "($res2 - $res1) / 60"|bc ) minutes ($(echo "$res2 - $res1"|bc ) seconds) ${txtrst}";	

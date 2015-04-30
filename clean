@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # location
-export KERNELDIR=`readlink -f .`;
+  export KERNELDIR=`readlink -f .`;
 
 make clean;
-
-# remove previous zImage files
-if [ -e $KERNELDIR/zImage ]; then
-  rm $KERNELDIR/zImage;
-fi;
+make distclean;
+make mrproper;
+rm -f $KERNELDIR/zImage;
