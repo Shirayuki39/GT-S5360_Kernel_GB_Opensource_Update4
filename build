@@ -7,6 +7,9 @@
   export KERNELDIR=`readlink -f .`;
   export PARENT_DIR=`readlink -f ${KERNELDIR}/..`;
 
+# link modules to parent directory
+  ln -s $KERNELDIR/modules $PARENT_DIR/modules
+
 # name
   export KBUILD_BUILD_USER=mohammad.afaneh
   export KBUILD_BUILD_HOST=ubuntu
