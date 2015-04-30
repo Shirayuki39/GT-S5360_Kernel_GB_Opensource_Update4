@@ -1,0 +1,60 @@
+#!/bin/bash
+
+version=1.0
+
+if [ ! -e menu ]
+then
+  echo
+  echo "Ensure you run this file from the SAME folder as where it was installed,"
+  echo "otherwise you will have problems running the scripts. After you 'cd' to "
+  echo "the correct folder, start with the ./menu command."
+  exit 0
+fi
+
+while :
+do
+
+  clear
+
+  echo
+  echo
+  echo "totoro Kernel build menu"
+  echo "Version $version"
+  echo
+  echo "----------------"
+  echo
+  echo "Enter a choice:"
+  echo 
+  echo "  b = compile kernel "
+  echo "  c = clean "
+  echo "  r = Restart "
+  echo "  x = Exit"
+  echo
+  echo "  NOTE: Other options may not be shown in this menu *until* a specific"
+  echo "  action above is selected or a specific working folder is created."
+  echo
+  echo -n "? "
+
+  read enterLetter
+
+  if [ "$enterLetter" == "c" ]
+  then
+    ./clean
+
+  elif [ "$enterLetter" == "b" ]
+  then
+    ./build
+  elif [ "$enterLetter" == "r" ]
+  then
+    ./menu
+
+  elif [ "$enterLetter" == "x" ]
+  then
+    exit
+  else 
+    echo "Invalid option"
+    continue
+  fi
+
+done
+
