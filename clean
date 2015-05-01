@@ -1,9 +1,16 @@
 #!/bin/bash
 
-# location
-  export KERNELDIR=`readlink -f .`;
+# Setting up Environment
+. ./env ${1} || exit 1;
 
-make clean;
+echo "${bldcya}***** Cleaning in Progress *****${txtrst}";
+
 make distclean;
-make mrproper;
+make clean;
 rm -f $KERNELDIR/zImage;
+rm -f $KERNELDIR/boot.img;
+rm -f $KERNELDIR/out/boot.img;
+rm -f $KERNELDIR/out/*.tar;
+rm -f $KERNELDIR/out/*.zip;
+
+echo "${bldcya}***** Cleaning Done *****${txtrst}";

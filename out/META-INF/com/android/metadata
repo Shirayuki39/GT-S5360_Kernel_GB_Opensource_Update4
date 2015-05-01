@@ -1,0 +1,3 @@
+post-build=samsung/cm_cooper/cooper:4.0.1/ICS_MR0/eng.ilia.20111212.150608:userdebug/test-keys
+post-timestamp=1323688016
+pre-device=cooper

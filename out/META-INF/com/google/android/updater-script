@@ -1,0 +1,22 @@
+ui_print("Instaling Kernel");
+mount("rfs", "EMMC", "/dev/block/stl9", "/system");
+show_progress(0.100000, 0);
+
+package_extract_file("bmlunlock", "bmlunlock");
+package_extract_file("boot.img", "boot.img");
+set_perm(0, 0, 0755, "bmlunlock");
+
+
+# mounting the sdcard
+mount("vfat", "/dev/block/mmcblk0p1", "/sdcard", "rw");
+
+
+# flashing
+run_program("bmlunlock");
+run_program("/system/bin/dd", "if=boot.img", "of=/dev/block/bml7");	 
+show_progress(0.2, 10);
+show_progress(0.100000, 0);
+
+ui_print("Done!");
+unmount("/system");
+

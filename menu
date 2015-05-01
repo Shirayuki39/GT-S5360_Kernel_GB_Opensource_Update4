@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=1.0
+version=2.0
 
 if [ ! -e menu ]
 then
@@ -26,6 +26,7 @@ do
   echo "Enter a choice:"
   echo 
   echo "  b = compile kernel "
+  echo "  g = build boot.img "
   echo "  c = clean "
   echo "  r = Restart "
   echo "  x = Exit"
@@ -44,6 +45,11 @@ do
   elif [ "$enterLetter" == "b" ]
   then
     ./build
+
+  elif [ "$enterLetter" == "g" ]
+  then
+    ./buildbootimg
+
   elif [ "$enterLetter" == "r" ]
   then
     ./menu

@@ -1,52 +1,29 @@
 #!/bin/bash
 
-# Colorize and add text parameters
-export red=$(tput setaf 1) # red
-export grn=$(tput setaf 2) # green
-export blu=$(tput setaf 4) # blue
-export cya=$(tput setaf 6) # cyan
-export txtbld=$(tput bold) # Bold
-export bldred=${txtbld}$(tput setaf 1) # Bold red
-export bldgrn=${txtbld}$(tput setaf 2) # Bold green
-export bldblu=${txtbld}$(tput setaf 4) # Bold blue
-export bldcya=${txtbld}$(tput setaf 6) # Bold cyan
-export txtrst=$(tput sgr0) # Reset
-
 # Time of build startup
   res1=$(date +%s.%N)
 
-# location
-  export KERNELDIR=`readlink -f .`;
-  export PARENT_DIR=`readlink -f ${KERNELDIR}/..`;
+  echo "${bldcya}***** Setting up Environment *****${txtrst}";
+. ./env ${1} || exit 1;
 
-# link modules to parent directory
-if [ -e $PARENT_DIR/modules ]; then
-  rm $PARENT_DIR/modules
+if [ ! -f $KERNELDIR/.config ]; then
+  echo "${bldcya}***** Writing Config *****${txtrst}";
+  cp $KERNELDIR/arch/arm/configs/$KERNEL_CONFIG .config;
+  make $KERNEL_CONFIG;
 fi;
-  ln -s $KERNELDIR/modules $PARENT_DIR/modules
 
-# name
-  export KBUILD_BUILD_USER=mohammad.afaneh
-  export KBUILD_BUILD_HOST=ubuntu
+. $KERNELDIR/.config
 
-# compiler
-  export ARCH=arm
-  export CROSS_COMPILE=$PARENT_DIR/arm-eabi-4.4.3/bin/arm-eabi-
-
-# defconfig
-  make bcm21553_totoro_05_defconfig
 
 # remove previous zImage files
 if [ -e $KERNELDIR/zImage ]; then
   rm $KERNELDIR/zImage;
+  rm $KERNELDIR/boot.img;
 fi;
 
 if [ -e $KERNELDIR/arch/arm/boot/zImage ]; then
   rm $KERNELDIR/arch/arm/boot/zImage;
 fi;
-
-# number of cpus
-export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`;
 
 # make zImage
   echo "${bldcya}***** Compiling kernel *****${txtrst}"
