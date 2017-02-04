@@ -1,66 +1,90 @@
 #!/bin/bash
 
-version=2.0
+# clear screen
+  clear 
 
-if [ ! -e menu ]
-then
-  echo
-  echo "Ensure you run this file from the SAME folder as where it was installed,"
-  echo "otherwise you will have problems running the scripts. After you 'cd' to "
-  echo "the correct folder, start with the ./menu command."
-  exit 0
-fi
+# location
+  export DIR=`readlink -f .`;
+  export PARENT_DIR=`readlink -f ${DIR}/..`;
 
-while :
-do
+# color
+  BGRED=`echo -e "\033[41m"`
+  NORMAL=`echo -e "\033[m"`
 
-  clear
-
+# menu
+  echo "${BGRED} bcm21553-common kernel build script${NORMAL}"
+  echo " "
+  echo " b. build"
+  echo " c. clean"
+  echo " "
+  echo " r. restart script"
+  echo " x. exit script"
+# Read the letter the user gives
   echo
-  echo
-  echo "totoro Kernel build menu"
-  echo "Version $version"
-  echo
-  echo "----------------"
-  echo
-  echo "Enter a choice:"
-  echo 
-  echo "  b = compile kernel "
-  echo "  g = build boot.img "
-  echo "  c = clean "
-  echo "  r = Restart "
-  echo "  x = Exit"
-  echo
-  echo "  NOTE: Other options may not be shown in this menu *until* a specific"
-  echo "  action above is selected or a specific working folder is created."
-  echo
-  echo -n "? "
-
   read enterLetter
 
-  if [ "$enterLetter" == "c" ]
-  then
-    ./clean
+# build
+  if [ "$enterLetter" == "b" ]
+    then
 
-  elif [ "$enterLetter" == "b" ]
-  then
-    ./build
+    # remove previous zImage files
+    if [ -e $PARENT_DIR/zImage ]; then
+      rm $PARENT_DIR/zImage;
+    fi;
 
-  elif [ "$enterLetter" == "g" ]
-  then
-    ./buildbootimg
+    #name
+    export KBUILD_BUILD_USER=mohammad.afaneh
+    export KBUILD_BUILD_HOST=ubuntu
 
+    # kernel config
+    export ARCH=arm;
+    export KERNEL_CONFIG="bcm21553_totoro_05_defconfig";
+
+    # link modules to parent directory
+    if [ -e $PARENT_DIR/modules ]; then
+     rm $PARENT_DIR/modules
+    fi;
+    ln -s $DIR/modules $PARENT_DIR/modules
+
+    # system compiler
+    export CROSS_COMPILE=$PARENT_DIR/arm-eabi-4.4.3/bin/arm-eabi-;
+
+    # build
+    export USER=`whoami`
+    export TMPFILE=`mktemp -t`;
+
+    export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`;
+
+    make $KERNEL_CONFIG;
+    make -j$NUMBEROFCPUS zImage
+
+    # final Touch for Kernel
+    if [ -e $DIR/arch/arm/boot/zImage ]; then
+      cp $DIR/arch/arm/boot/zImage $PARENT_DIR/zImage;
+    fi;
+    stat $PARENT_DIR/zImage || exit 1;
+
+# clean
+  elif [ "$enterLetter" == "c" ]
+    then
+    # system compiler
+    export CROSS_COMPILE=$PARENT_DIR/arm-eabi-4.4.3/bin/arm-eabi-;
+    make clean
+    make mrproper
+    $DIR/menu
+
+# Restart
   elif [ "$enterLetter" == "r" ]
-  then
-    ./menu
+    then
+    $DIR/menu
 
+# Exit
   elif [ "$enterLetter" == "x" ]
-  then
-    exit
-  else 
-    echo "Invalid option"
-    continue
-  fi
+    then
+    exit 0
 
-done
-
+# Other choice
+  else
+    echo "Invalid option."
+    $DIR/menu
+fi
